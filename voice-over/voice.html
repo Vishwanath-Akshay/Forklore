@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recipe Carousel</title>
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,600,700" rel="stylesheet" type="text/css">
+  <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="../recipepage.css">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Open Sans', sans-serif;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      background-image: url('https://example.com/path/to/your/image.jpg'); /* Replace with your image path */
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-position: center center;
+    }
+
+    .carousel {
+      width: 80%;
+      max-width: 800px;
+      background: rgba(255, 255, 255, 0.8);
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .carousel-item {
+      display: none;
+      text-align: center;
+    }
+
+    .carousel-item.active {
+      display: block;
+    }
+
+    .carousel-item video {
+      width: 100%;
+      border-radius: 10px;
+      margin-bottom: 20px;
+    }
+
+    .carousel-item p {
+      font-size: 1.2em;
+    }
+
+    .button-group {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+    }
+
+    .styled-button {
+      padding: 10px 20px;
+      font-size: 1em;
+      color: white;
+      background-color: #4CAF50;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .styled-button:hover {
+      background-color: #45a049;
+    }
+
+    .timer-button {
+      background-color: #ff9800;
+    }
+
+    .timer-display {
+      margin-top: 10px;
+      font-size: 1.5em;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Recipe Carousel</h1>
+    <div class="carousel">
+      <div class="carousel-item active" data-time="5">
+        <h2>Step 1: Preheat the oven</h2>
+        <video src="../carousel/c1.mp4" controls></video>
+        <p>Preheat the oven to 375°F (190°C).</p>
+        <button class="timer-button styled-button">Start Timer</button>
+        <div class="timer-display">00:00</div>
+        <div class="button-group">
+          <button class="prev-button styled-button">Previous</button>
+          <button class="next-button styled-button">Next</button>
+        </div>
+      </div>
+      <div class="carousel-item" data-time="10">
+        <h2>Step 2: Mix the ingredients</h2>
+        <video src="../carousel/c1.mp4" controls></video>
+        <p>Mix the ingredients thoroughly.</p>
+        <button class="timer-button styled-button">Start Timer</button>
+        <div class="timer-display">00:00</div>
+        <div class="button-group">
+          <button class="prev-button styled-button">Previous</button>
+          <button class="next-button styled-button">Next</button>
+        </div>
+      </div>
+      <div class="carousel-item" data-time="15">
+        <h2>Step 3: Bake the mixture</h2>
+        <video src="../carousel/c1.mp4" controls></video>
+        <p>Bake the mixture for 15 minutes.</p>
+        <button class="timer-button styled-button">Start Timer</button>
+        <div class="timer-display">00:00</div>
+        <div class="button-group">
+          <button class="prev-button styled-button">Previous</button>
+          <button class="next-button styled-button">Next</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Carousel functionality
+    let currentSlide = 0;
+    const items = document.querySelectorAll('.carousel-item');
+    const prevButtons = document.querySelectorAll('.prev-button');
+    const nextButtons = document.querySelectorAll('.next-button');
+    const timerButtons = document.querySelectorAll('.timer-button');
+    const timerDisplays = document.querySelectorAll('.timer-display');
+
+    function showSlide(index) {
+      items[currentSlide].classList.remove('active');
+      currentSlide = (index + items.length) % items.length;
+      items[currentSlide].classList.add('active');
+    }
+
+    prevButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        showSlide(currentSlide - 1);
+      });
+    });
+
+    nextButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        showSlide(currentSlide + 1);
+      });
+    });
+
+    // Timer functionality
+    timerButtons.forEach((button, index) => {
+      button.addEventListener('click', () => {
+        const duration = items[index].getAttribute('data-time') * 60;
+        let timeRemaining = duration;
+        const display = timerDisplays[index];
+        display.textContent = formatTime(timeRemaining);
+
+        const interval = setInterval(() => {
+          timeRemaining--;
+          display.textContent = formatTime(timeRemaining);
+
+          if (timeRemaining <= 0) {
+            clearInterval(interval);
+            playBeepSound();
+          }
+        }, 1000);
+      });
+    });
+
+    function formatTime(seconds) {
+      const minutes = Math.floor(seconds / 60);
+      const remainingSeconds = seconds % 60;
+      return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+    }
+
+    function playBeepSound() {
+      const audio = new Audio('https://www.soundjay.com/button/beep-07.wav');
+      audio.play();
+    }
+
+    // Text-to-Speech functionality
+    function speakText(text) {
+      const speech = new SpeechSynthesisUtterance(text);
+      window.speechSynthesis.speak(speech);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      items.forEach(item => {
+        const paragraph = item.querySelector('p');
+        paragraph.addEventListener('mouseenter', () => {
+          speakText(paragraph.textContent);
+        });
+      });
+    });
+  </script>
+</body>
+</html>
